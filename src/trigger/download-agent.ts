@@ -5,7 +5,7 @@ import {
   runVerificationInSandbox,
 } from "../lib/verification.js";
 
-const cronPattern = process.env.DOWNLOAD_AGENT_CRON ?? "0 9 * * *";
+const cronPattern = process.env.DOWNLOAD_AGENT_CRON ?? "0 21 * * *";
 const cronTimezone =
   process.env.DOWNLOAD_AGENT_TIMEZONE ?? "America/Los_Angeles";
 
