@@ -1,0 +1,28 @@
+{
+  "name": "download-agent",
+  "version": "1.0.0",
+  "description": "Scheduled Trigger.dev download/install verification agent",
+  "main": "dist/index.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "trigger dev",
+    "deploy": "trigger deploy",
+    "local": "set -a; . ./.env; set +a; tsx src/local-run.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@trigger.dev/sdk": "^4.4.3",
+    "e2b": "^2.18.0",
+    "resend": "^6.9.4"
+  },
+  "devDependencies": {
+    "@trigger.dev/build": "^4.4.3",
+    "@types/node": "^25.5.0",
+    "trigger.dev": "^4.4.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
