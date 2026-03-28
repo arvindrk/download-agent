@@ -108,7 +108,7 @@ export async function runVerificationInSandbox(): Promise<VerificationSuccess> {
       sandbox,
       stage: "skill_install_check",
       command:
-        "npx --yes skills add https://github.com/arvindrk/extract-design-system --skill extract-design-system",
+        "npx --yes skills add https://github.com/arvindrk/extract-design-system --skill extract-design-system --agent '*' --yes && npx --yes skills ls --json | node -e \"const fs=require('fs');const raw=fs.readFileSync(0,'utf8');let data;try{data=JSON.parse(raw);}catch{console.error('invalid skills ls json');process.exit(1);}const ok=JSON.stringify(data).includes('extract-design-system');if(!ok){console.error('extract-design-system missing after install');process.exit(1);}process.stdout.write('skill-install-verified');\"",
       stageResults,
       sandboxId,
     });
