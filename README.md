@@ -27,7 +27,6 @@ npm install
 ```
 
 3. Configure Trigger.dev:
-   - Set `TRIGGER_PROJECT_REF`.
    - Set `TRIGGER_SECRET_KEY`.
 4. Configure E2B:
    - Set `E2B_API_KEY`.
