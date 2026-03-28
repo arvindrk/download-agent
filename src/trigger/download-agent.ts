@@ -5,8 +5,9 @@ import {
   runVerificationInSandbox,
 } from "../lib/verification.js";
 
-const cronPattern = process.env.DOWNLOAD_AGENT_CRON ?? "0 6 * * *";
-const cronTimezone = process.env.DOWNLOAD_AGENT_TIMEZONE ?? "UTC";
+const cronPattern = process.env.DOWNLOAD_AGENT_CRON ?? "0 9 * * *";
+const cronTimezone =
+  process.env.DOWNLOAD_AGENT_TIMEZONE ?? "America/Los_Angeles";
 
 export const downloadAgentScheduledTask = schedules.task({
   id: "download-agent-scheduled-check",
@@ -45,7 +46,9 @@ export const downloadAgentScheduledTask = schedules.task({
               command: "internal",
               exitCode: 1,
               stderr:
-                error instanceof Error ? error.stack ?? error.message : String(error),
+                error instanceof Error
+                  ? (error.stack ?? error.message)
+                  : String(error),
               stdout: "",
               sandboxId: "unknown",
             });
