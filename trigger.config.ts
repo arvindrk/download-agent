@@ -1,5 +1,10 @@
 import { defineConfig } from "@trigger.dev/sdk/v3";
 
+/*
+ *  1010 - proj_immlomxhsxucqooervzb
+ *  10 - proj_iztwrztlpfaoqzyjwzay
+ */
+
 export default defineConfig({
   project: "proj_iztwrztlpfaoqzyjwzay",
   runtime: "node",
