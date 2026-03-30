@@ -3,6 +3,8 @@ import { defineConfig } from "@trigger.dev/sdk/v3";
 /*
  *  1010 - proj_immlomxhsxucqooervzb
  *  10 - proj_iztwrztlpfaoqzyjwzay
+ *  intern - proj_bpjyhxeeoajeiuqanlam
+ *  scouts - proj_qjhgmulzkvxqcjhtoxvm
  */
 
 export default defineConfig({
