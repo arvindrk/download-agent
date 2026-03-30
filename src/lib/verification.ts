@@ -66,6 +66,15 @@ function asCommandResult(value: unknown): RawCommandResult {
   return value as RawCommandResult;
 }
 
+function getPackageVersionFromPackResult(stdout: string): string {
+  try {
+    const parsed = JSON.parse(stdout) as { version?: unknown };
+    return typeof parsed.version === "string" ? parsed.version : "";
+  } catch {
+    return "";
+  }
+}
+
 export async function runVerificationInSandbox(): Promise<VerificationSuccess> {
   const sandbox = await Sandbox.create();
   const sandboxId = sandbox.sandboxId;
@@ -77,29 +86,23 @@ export async function runVerificationInSandbox(): Promise<VerificationSuccess> {
   try {
     await runStage({
       sandbox,
-      stage: "npm_metadata_check",
-      command:
-        "npm view extract-design-system version --loglevel=error --json > version.json && node -e \"const fs=require('fs');const raw=fs.readFileSync('version.json','utf8');const parsed=JSON.parse(raw);const version=Array.isArray(parsed)?parsed[0]:parsed;process.stdout.write(String(version));\"",
-      stageResults,
-      sandboxId,
-    });
-
-    packageVersion = stageResults[0]?.stdout.trim() ?? "";
-
-    await runStage({
-      sandbox,
       stage: "npm_pack_check",
       command:
-        "npm pack extract-design-system --silent --loglevel=error > pack-output.txt && node -e \"const fs=require('fs');const s=fs.readFileSync('pack-output.txt','utf8').trim();process.stdout.write(s);\"",
+        "NPM_CONFIG_CACHE=\"$(mktemp -d)\" npm pack extract-design-system --json --loglevel=error > pack-output.json && node -e \"const fs=require('fs');const raw=fs.readFileSync('pack-output.json','utf8');const parsed=JSON.parse(raw);const entry=Array.isArray(parsed)?parsed[0]:parsed;process.stdout.write(JSON.stringify({filename:String(entry?.filename ?? ''),version:String(entry?.version ?? '')}));\"",
       stageResults,
       sandboxId,
     });
+
+    packageVersion =
+      getPackageVersionFromPackResult(
+        stageResults.find((stage) => stage.stage === "npm_pack_check")?.stdout.trim() ?? "",
+      );
 
     await runStage({
       sandbox,
       stage: "npm_install_check",
       command:
-        "mkdir -p /tmp/pkg-install-check && cd /tmp/pkg-install-check && npm init -y >/dev/null 2>&1 && npm install extract-design-system --loglevel=error && node -e \"require.resolve('extract-design-system/package.json');process.stdout.write('install-ok');\"",
+        "mkdir -p /tmp/pkg-install-check && cd /tmp/pkg-install-check && npm init -y >/dev/null 2>&1 && NPM_CONFIG_CACHE=\"$(mktemp -d)\" npm install extract-design-system --loglevel=error && node -e \"require.resolve('extract-design-system/package.json');process.stdout.write('install-ok');\"",
       stageResults,
       sandboxId,
     });
@@ -109,14 +112,6 @@ export async function runVerificationInSandbox(): Promise<VerificationSuccess> {
       stage: "skill_install_check",
       command:
         "npx --yes skills add https://github.com/arvindrk/extract-design-system --skill extract-design-system --agent '*' --yes && npx --yes skills ls --json | node -e \"const fs=require('fs');const raw=fs.readFileSync(0,'utf8');let data;try{data=JSON.parse(raw);}catch{console.error('invalid skills ls json');process.exit(1);}const ok=JSON.stringify(data).includes('extract-design-system');if(!ok){console.error('extract-design-system missing after install');process.exit(1);}process.stdout.write('skill-install-verified');\"",
-      stageResults,
-      sandboxId,
-    });
-
-    await runStage({
-      sandbox,
-      stage: "smoke_check",
-      command: "npx --yes skills --help",
       stageResults,
       sandboxId,
     });
